@@ -1,0 +1,278 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
+\usepackage{parskip}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{pystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4
+}
+\lstset{style=pystyle}
+
+\title{\textbf{SEMT20003 Practice Paper 3}\\ Advanced Optimization and Convolutional Networks}
+\author{}
+\date{\textbf{Time:} 3 hours \quad \textbf{Total Marks:} 100}
+
+\begin{document}
+
+\maketitle
+
+\section*{Part I: Multiple Choice Questions (25 marks)}
+\textit{Answer all questions. Each question has 4 possible options. Between ONE and THREE of these options may be correct. For full marks (5 marks per question), you must state exactly the correct options. No partial credit is awarded.}
+
+\begin{enumerate}
+    \item \textbf{How does introducing momentum affect the optimization trajectory compared to standard Gradient Descent?}
+    \begin{enumerate}
+        \item[A)] It dampens oscillations in directions with high curvature.
+        \item[B)] It accelerates progress in directions where the gradient consistently points the same way.
+        \item[C)] It guarantees convergence to the global minimum in non-convex landscapes.
+        \item[D)] It acts like a friction term, exponentially decaying past gradient contributions.
+    \end{enumerate}
+    \vspace{0.5cm}
+
+    \item \textbf{Which of the following represent core differences between the Adam optimizer and standard Stochastic Gradient Descent (SGD)?}
+    \begin{enumerate}
+        \item[A)] Adam computes individual adaptive learning rates for different parameters.
+        \item[B)] Adam incorporates the second moment (uncentered variance) of the gradients.
+        \item[C)] SGD uses the entire dataset for each update, whereas Adam uses mini-batches.
+        \item[D)] Adam requires a bias correction step during early iterations.
+    \end{enumerate}
+    \vspace{0.5cm}
+
+    \item \textbf{An input image of shape $10 \times 10$ is processed by a 2D convolutional layer with a $3 \times 3$ kernel, a stride of 2, and a padding of 1. What is the spatial dimension of the output?}
+    \begin{enumerate}
+        \item[A)] $4 \times 4$
+        \item[B)] $5 \times 5$
+        \item[C)] $6 \times 6$
+        \item[D)] $9 \times 9$
+    \end{enumerate}
+    \vspace{0.5cm}
+
+    \item \textbf{When comparing Average Pooling and Max Pooling, which of the following mathematical properties are true?}
+    \begin{enumerate}
+        \item[A)] Max Pooling propagates the gradient only to the neuron that had the highest forward-pass value within the window.
+        \item[B)] Average Pooling multiplies the upstream gradient by the window size during backpropagation.
+        \item[C)] Average Pooling distributes the upstream gradient equally among all neurons in the pooling window.
+        \item[D)] Max Pooling preserves background information better than prominent features.
+    \end{enumerate}
+    \vspace{0.5cm}
+
+    \item \textbf{Regarding the loss landscape of deep neural networks, why are broad (flat) minima generally preferred over sharp minima?}
+    \begin{enumerate}
+        \item[A)] Broad minima consistently have lower training loss values than sharp minima.
+        \item[B)] Small perturbations in the weights at a broad minimum do not cause severe increases in the loss.
+        \item[C)] The discrepancy between the training loss landscape and the test loss landscape is less likely to degrade performance if the minimum is broad.
+        \item[D)] Optimization algorithms evaluate gradients faster in flat regions.
+    \end{enumerate}
+\end{enumerate}
+
+\vspace{1cm}
+
+\section*{Part II: Programming-related Questions (35 marks)}
+
+\textbf{Question 1: Naive 2D Convolution (20 marks)}\\
+Write a Python function using NumPy that implements a naive 2D convolution for a single-channel input image and a single filter. 
+
+Your function \texttt{conv2d(X, W, padding, stride)} should accept:
+\begin{itemize}
+    \item \texttt{X}: A 2D NumPy array of shape \texttt{(H, W)}.
+    \item \texttt{W}: A 2D NumPy array (the filter) of shape \texttt{(K, K)}.
+    \item \texttt{padding}: An integer $P$ representing the number of zero-padding layers to add to all sides of \texttt{X}.
+    \item \texttt{stride}: An integer $S$ representing the step size of the filter.
+\end{itemize}
+The function must return the output 2D array. You may use standard loops; vectorization is not strictly required.
+
+\vspace{0.5cm}
+
+\textbf{Question 2: Adam Optimizer Implementation (15 marks)}\\
+Write a Python function that executes a single parameter update step using the Adam optimizer algorithm.
+
+Your function \texttt{adam\_step(w, grad, m, v, t, lr=0.001, beta1=0.9, beta2=0.999, eps=1e-8)} should accept the current parameter \texttt{w}, its gradient \texttt{grad}, the first and second moment estimates \texttt{m} and \texttt{v}, and the current timestep \texttt{t} (starting at 1).
+
+The function must:
+1. Update the biased first moment estimate.
+2. Update the biased second raw moment estimate.
+3. Compute the bias-corrected first and second moment estimates.
+4. Update the parameter \texttt{w}.
+5. Return the updated tuple \texttt{(w, m, v)}.
+
+\vspace{1cm}
+
+\section*{Part III: Analytic Questions (40 marks)}
+
+\textbf{Question 1: CNN Dimensionality Derivation (20 marks)}\\
+Consider an input tensor $\mathbf{X}$ of spatial shape $(H, W)$. It passes through a convolutional layer with a square kernel of size $K \times K$. 
+\begin{itemize}
+    \item \textbf{a) (10 marks):} Define "Full Padding" mathematically in terms of $K$. Analytically derive the output spatial dimensions $(H_{out}, W_{out})$ given Full Padding and an arbitrary stride $S$.
+    \item \textbf{b) (10 marks):} This output is immediately processed by a Max Pooling layer with a pooling window of size $P \times P$ and a stride of $P$ (non-overlapping). State the final mathematical formula for the spatial height of the resulting tensor.
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Question 2: Minima Landscapes and Generalization (20 marks)}\\
+Deep neural networks often encounter a highly non-convex loss landscape containing both sharp minima and broad (flat) minima.
+\begin{itemize}
+    \item \textbf{a) (10 marks):} Explain the discrepancy between the empirical training loss surface and the expected test loss surface. Construct a logical argument explaining why a solution resting in a sharp training minimum often yields poor generalization (high test error) compared to a broad minimum.
+    \item \textbf{b) (10 marks):} Discuss how the inherent mechanics of mini-batch Stochastic Gradient Descent (SGD) bias the optimization process toward finding broad minima rather than sharp minima. Refer specifically to the concept of gradient noise.
+\end{itemize}
+
+\newpage
+
+\section*{Mark Scheme: Practice Paper 3}
+
+\subsection*{Part I: Multiple Choice Questions (25 marks)}
+\textit{5 marks per question. Must state exactly the correct combinations. Partial credit is 0.}
+
+\begin{enumerate}
+    \item \textbf{A, B, D}\\
+    \textit{Rationale:} Momentum accumulates past gradients. In ravines (high curvature), oscillating gradients cancel out (A). In consistent directions, accumulation accelerates progress (B). It acts mathematically as an exponential moving average (friction) of past gradients (D). It does not guarantee finding a global minimum (C).
+
+    \item \textbf{A, B, D}\\
+    \textit{Rationale:} Adam adapts learning rates per parameter (A) by dividing by the square root of the second moment (B). Because moments are initialized at zero, they require bias correction to prevent initial steps from being artificially large (D). Both SGD and Adam typically use mini-batches in practice (C is false).
+
+    \item \textbf{B}\\
+    \textit{Rationale:} The formula is $O = \lfloor(W - K + 2P)/S\rfloor + 1$. Here, $W=10, K=3, P=1, S=2$. 
+    $O = \lfloor(10 - 3 + 2(1))/2\rfloor + 1 = \lfloor(9)/2\rfloor + 1 = 4 + 1 = 5$. Output is $5 \times 5$.
+
+    \item \textbf{A, C}\\
+    \textit{Rationale:} Max pooling only routes the gradient to the input pixel that had the maximum value; the others get zero gradient (A is true). Average pooling distributes the upstream gradient equally (divided by the window size) to all pixels in the window (C is true, B is false). Max pooling extracts prominent features, not background (D is false).
+
+    \item \textbf{B, C}\\
+    \textit{Rationale:} The training and test sets are sampled from the same distribution, but are not identical. The test loss landscape is a slightly shifted version of the training loss landscape. In a broad minimum, this shift does not change the loss much (B, C). Sharp minima do not necessarily have higher training loss; they can easily reach zero training loss (A is false). Gradients are not evaluated faster in flat regions (D is false).
+\end{enumerate}
+
+\subsection*{Part II: Programming-related Questions (35 marks)}
+
+\textbf{Question 1 (20 marks)}
+\begin{itemize}
+    \item \textbf{4 marks:} Correctly applying zero padding to the input array using \texttt{np.pad}.
+    \item \textbf{6 marks:} Correctly calculating the output dimensions given the padding and stride.
+    \item \textbf{5 marks:} Implementing nested loops to iterate over the spatial dimensions of the output.
+    \item \textbf{5 marks:} Correctly extracting the input patch and computing the sum of the element-wise multiplication (dot product) with the filter.
+\end{itemize}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+
+def conv2d(X, W, padding, stride):
+    # 4 marks: Apply padding
+    X_padded = np.pad(X, ((padding, padding), (padding, padding)), mode='constant')
+    
+    H, W_dim = X.shape
+    K, _ = W.shape
+    
+    # 6 marks: Calculate output dimensions
+    H_out = int((H - K + 2 * padding) / stride) + 1
+    W_out = int((W_dim - K + 2 * padding) / stride) + 1
+    
+    out = np.zeros((H_out, W_out))
+    
+    # 10 marks: Convolution loops and computation
+    for i in range(H_out):
+        for j in range(W_out):
+            h_start = i * stride
+            h_end = h_start + K
+            w_start = j * stride
+            w_end = w_start + K
+            
+            patch = X_padded[h_start:h_end, w_start:w_end]
+            out[i, j] = np.sum(patch * W)
+            
+    return out
+\end{lstlisting}
+
+\textbf{Question 2 (15 marks)}
+\begin{itemize}
+    \item \textbf{3 marks:} Updating the biased first moment \texttt{m}.
+    \item \textbf{3 marks:} Updating the biased second moment \texttt{v}.
+    \item \textbf{4 marks:} Computing the bias-corrected estimates \texttt{m\_hat} and \texttt{v\_hat}.
+    \item \textbf{5 marks:} Applying the final parameter update rule.
+\end{itemize}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+
+def adam_step(w, grad, m, v, t, lr=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
+    # Update biased first moment estimate
+    m = beta1 * m + (1.0 - beta1) * grad
+    
+    # Update biased second raw moment estimate
+    v = beta2 * v + (1.0 - beta2) * (grad ** 2)
+    
+    # Compute bias-corrected first and second moment estimates
+    m_hat = m / (1.0 - beta1 ** t)
+    v_hat = v / (1.0 - beta2 ** t)
+    
+    # Update parameters
+    w = w - lr * m_hat / (np.sqrt(v_hat) + eps)
+    
+    return w, m, v
+\end{lstlisting}
+
+\subsection*{Part III: Analytic Questions (40 marks)}
+
+\textbf{Question 1: CNN Dimensionality Derivation (20 marks)}
+
+\textbf{Part a) (10 marks)}
+\begin{itemize}
+    \item \textbf{3 marks:} Defining Full Padding mathematically. Full padding means adding enough zeros such that the filter only touches one pixel of the original image at the extreme corners. $P = K - 1$.
+    \item \textbf{7 marks:} Substituting into the output dimension formula.
+    \begin{align*}
+    H_{out} &= \lfloor \frac{H - K + 2P}{S} \rfloor + 1 \\
+    H_{out} &= \lfloor \frac{H - K + 2(K - 1)}{S} \rfloor + 1 \\
+    H_{out} &= \lfloor \frac{H + K - 2}{S} \rfloor + 1 
+    \end{align*}
+    (Same logic applies to $W_{out} = \lfloor \frac{W + K - 2}{S} \rfloor + 1$).
+\end{itemize}
+
+\textbf{Part b) (10 marks)}
+\begin{itemize}
+    \item \textbf{10 marks:} Applying the pooling logic. The input to the pooling layer is $H_{out}$. With a window size $P$ and stride $P$, and zero padding for pooling, the final dimension $H_{final}$ is:
+    \begin{align*}
+    H_{final} &= \lfloor \frac{H_{out} - P}{P} \rfloor + 1 \\
+    H_{final} &= \lfloor \frac{H_{out}}{P} - 1 \rfloor + 1 = \lfloor \frac{H_{out}}{P} \rfloor
+    \end{align*}
+    Substituting $H_{out}$ from part (a):
+    \begin{align*}
+    H_{final} &= \lfloor \frac{\lfloor \frac{H + K - 2}{S} \rfloor + 1}{P} \rfloor
+    \end{align*}
+\end{itemize}
+
+\textbf{Question 2: Minima Landscapes and Generalization (20 marks)}
+
+\textbf{Part a) Discrepancy and Generalization (10 marks)}
+\begin{itemize}
+    \item \textbf{5 marks:} Explaining the discrepancy. We optimize the model on a finite training set, which is an approximation of the true underlying data distribution. Consequently, the test set loss landscape is slightly shifted horizontally/vertically relative to the training landscape.
+    \item \textbf{5 marks:} Argument for broad minima. A sharp minimum resembles a narrow spike. A small shift in the landscape means the parameters at the bottom of the training minimum now lie high up on the wall of the test minimum, yielding high error. A broad minimum resembles a wide bowl; the same spatial shift keeps the parameters near the flat bottom, maintaining low error. Therefore, broad minima generalize better.
+\end{itemize}
+
+\textbf{Part b) SGD Bias toward Broad Minima (10 marks)}
+\begin{itemize}
+    \item \textbf{5 marks:} Mini-batch noise definition. Because SGD estimates the full gradient using only a small subset (mini-batch) of the data, the calculated gradient contains inherent stochastic noise at every step.
+    \item \textbf{5 marks:} Escape mechanism. In a sharp minimum, the walls are steep and narrow. The noise from the mini-batch gradients acts like physical agitation, easily generating a step large enough to "bounce" the optimizer out of the narrow valley. In a broad minimum, the flat region absorbs this noise; the optimizer wanders but lacks the gradient momentum to climb the distant, shallow walls. Thus, SGD naturally escapes sharp minima and settles in broad minima.
+\end{itemize}
+
+\end{document}

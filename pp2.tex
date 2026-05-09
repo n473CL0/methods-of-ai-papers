@@ -1,0 +1,293 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
+\usepackage{parskip}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{pystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4
+}
+\lstset{style=pystyle}
+
+\title{\textbf{SEMT20003 Practice Paper 2}\\ Classification, Backpropagation, and Overfitting}
+\author{}
+\date{\textbf{Time:} 3 hours \quad \textbf{Total Marks:} 100}
+
+\begin{document}
+
+\maketitle
+
+\section*{Part I: Multiple Choice Questions (25 marks)}
+\textit{Answer all questions. Each question has 4 possible options. Between ONE and THREE of these options may be correct. For full marks (5 marks per question), you must state exactly the correct options. No partial credit is awarded.}
+
+\begin{enumerate}
+    \item \textbf{When training a classification model using Gradient Descent, why is the Sigmoid function preferred over the Heaviside step function for generating probabilities?}
+    \begin{enumerate}
+        \item[A)] The Heaviside function has a gradient of exactly zero almost everywhere, making learning impossible.
+        \item[B)] The Sigmoid function perfectly avoids the vanishing gradient problem in deep networks.
+        \item[C)] The Sigmoid function provides a smooth, differentiable landscape everywhere.
+        \item[D)] The Heaviside function outputs values outside the range $[0, 1]$.
+    \end{enumerate}
+    \vspace{0.5cm}
+
+    \item \textbf{Which of the following functions contain points that are mathematically non-differentiable?}
+    \begin{enumerate}
+        \item[A)] Mean Squared Error (MSE) loss
+        \item[B)] Mean Absolute Error (MAE) loss
+        \item[C)] Rectified Linear Unit (ReLU) activation
+        \item[D)] Sigmoid activation
+    \end{enumerate}
+    \vspace{0.5cm}
+
+    \item \textbf{Which of the following statements correctly describe the mechanics of backpropagation through a computational graph?}
+    \begin{enumerate}
+        \item[A)] Gradients are computed starting from the input nodes and moving forward to the output node.
+        \item[B)] The chain rule is applied by multiplying the local gradient at a node by the upstream gradient received from its output.
+        \item[C)] An addition node routes the exact same upstream gradient equally to all of its input branches.
+        \item[D)] A multiplication node $f = x \times y$ uses the value of $y$ as the local gradient for $x$, and $x$ for $y$.
+    \end{enumerate}
+    \vspace{0.5cm}
+
+    \item \textbf{When observing loss curves during the training of a neural network, which of the following combinations strongly indicates that the model is overfitting?}
+    \begin{enumerate}
+        \item[A)] The training loss steadily decreases toward zero.
+        \item[B)] The validation loss initially decreases but then begins to steadily increase.
+        \item[C)] Both the training and validation loss fail to decrease from their initial values.
+        \item[D)] The training loss increases while the validation loss decreases.
+    \end{enumerate}
+    \vspace{0.5cm}
+
+    \item \textbf{How does Early Stopping act as a regularization mechanism?}
+    \begin{enumerate}
+        \item[A)] It periodically evaluates the model on a held-out validation set during training.
+        \item[B)] It halts training immediately when the training loss reaches zero.
+        \item[C)] It stops training when validation performance ceases to improve, typically restoring the best previous weights.
+        \item[D)] It automatically decreases the learning rate when the training loss plateaus.
+    \end{enumerate}
+\end{enumerate}
+
+\vspace{1cm}
+
+\section*{Part II: Programming-related Questions (35 marks)}
+
+\textbf{Question 1: Dropout Implementation (15 marks)}\\
+Write a Python function using NumPy that implements the Dropout regularization technique for a given input tensor (array) \texttt{x}. 
+
+Your function \texttt{dropout(x, p, is\_train)} should accept:
+\begin{itemize}
+    \item \texttt{x}: A NumPy array of any shape containing intermediate activations.
+    \item \texttt{p}: A float between 0.0 and 1.0 representing the probability of \textit{dropping} a neuron (setting it to zero).
+    \item \texttt{is\_train}: A boolean indicating whether the network is in training mode (\texttt{True}) or evaluation mode (\texttt{False}).
+\end{itemize}
+The function must return the modified tensor. Ensure you implement \textit{inverted dropout}, meaning the active neurons are properly scaled during the training phase so that the expected value remains constant, and no scaling is required during the evaluation phase.
+
+\vspace{0.5cm}
+
+\textbf{Question 2: Backward Pass for Dense + Sigmoid Layer (20 marks)}\\
+You are given the intermediate variables of a forward pass for a single dense layer followed by a Sigmoid activation:
+\begin{align*}
+\mathbf{Z} &= \mathbf{X} \mathbf{W} + \mathbf{b} \\
+\mathbf{A} &= \sigma(\mathbf{Z})
+\end{align*}
+Write a Python function \texttt{backward\_pass(X, W, A, d\_out)} that calculates the gradients of the loss with respect to \texttt{X}, \texttt{W}, and \texttt{b}. 
+
+The function accepts:
+\begin{itemize}
+    \item \texttt{X}: Input array of shape \texttt{(N, D\_in)}
+    \item \texttt{W}: Weight array of shape \texttt{(D\_in, D\_out)}
+    \item \texttt{A}: The post-activation output array of shape \texttt{(N, D\_out)} (i.e., the result of the Sigmoid).
+    \item \texttt{d\_out}: The upstream gradient of the loss with respect to \texttt{A}, of shape \texttt{(N, D\_out)}.
+\end{itemize}
+Return a tuple containing \texttt{(dX, dW, db)}.
+
+\vspace{1cm}
+
+\section*{Part III: Analytic Questions (40 marks)}
+
+\textbf{Question 1: Computational Graph Tracing (20 marks)}\\
+Consider a computational graph defining a function $f(x, y)$:
+\begin{align*}
+p &= x \cdot y \\
+q &= \max(0, p) \\
+r &= x - y \\
+s &= r^2 \\
+f &= q + s
+\end{align*}
+
+Given the inputs $x = 2$ and $y = -1$:
+\begin{itemize}
+    \item \textbf{a) (5 marks):} Calculate the forward pass values for nodes $p, q, r, s,$ and $f$.
+    \item \textbf{b) (15 marks):} Analytically trace the backpropagation algorithm through this graph to compute the exact numerical values for the gradients $\frac{\partial f}{\partial x}$ and $\frac{\partial f}{\partial y}$. Show the local gradient calculations at each node.
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Question 2: Weight Decay vs. Decoupled Weight Decay (20 marks)}\\
+Standard L2 Regularization (Weight Decay) is often added directly to the loss function: $L' = L + \frac{\lambda}{2} \|\mathbf{w}\|^2$. 
+
+\begin{itemize}
+    \item \textbf{a) (10 marks):} Derive the gradient of the modified loss $L'$ with respect to the weights $\mathbf{w}$. Show how this changes the standard Stochastic Gradient Descent (SGD) update rule.
+    \item \textbf{b) (10 marks):} Advanced optimizers like Adam use moving averages of gradients and squared gradients. Explain mathematically why adding L2 regularization to the loss function (standard Weight Decay) behaves undesirably when combined with Adam. Describe how \textit{Decoupled Weight Decay} (as used in AdamW) solves this issue by modifying the update rule directly rather than the loss function.
+\end{itemize}
+
+\newpage
+
+\section*{Mark Scheme: Practice Paper 2}
+
+\subsection*{Part I: Multiple Choice Questions (25 marks)}
+\textit{5 marks per question. Must state exactly the correct combinations. Partial credit is 0.}
+
+\begin{enumerate}
+    \item \textbf{A, C}\\
+    \textit{Rationale:} A is true; the Heaviside function is flat everywhere except at $x=0$, meaning its derivative is $0$, providing no gradient signal to update weights. C is true; Sigmoid is differentiable for all real numbers. B is false; Sigmoid actually \textit{suffers} from the vanishing gradient problem because its gradients approach zero for very large or small inputs. D is false; Heaviside outputs 0 or 1, which are perfectly valid probabilities.
+
+    \item \textbf{B, C}\\
+    \textit{Rationale:} MSE (A) and Sigmoid (D) are smooth continuous functions and differentiable everywhere. MAE (B) has a sharp kink at exactly $0$ error. ReLU (C) has a kink at exactly $x=0$, making them non-differentiable at those specific points.
+
+    \item \textbf{B, C, D}\\
+    \textit{Rationale:} A is false; backpropagation computes gradients starting from the output and moving backward to the inputs. B is the exact definition of the chain rule in this context. C is true; addition distributes the gradient. D is true; the local gradient of $x \cdot y$ with respect to $x$ is $y$, and vice versa.
+
+    \item \textbf{A, B}\\
+    \textit{Rationale:} Overfitting occurs when the model memorizes the training data but fails to generalize. This is visualized by the training loss continuing to decrease (A) while the validation loss begins to increase (B). 
+
+    \item \textbf{A, C}\\
+    \textit{Rationale:} Early stopping involves evaluating on a separate validation set (A) and halting the training loop when validation metrics worsen over a certain number of epochs, preventing the model from fitting the noise in the training set (C). B and D describe different mechanisms entirely.
+\end{enumerate}
+
+\subsection*{Part II: Programming-related Questions (35 marks)}
+
+\textbf{Question 1 (15 marks)}
+\begin{itemize}
+    \item \textbf{3 marks:} Correctly identifying return behavior for evaluation mode.
+    \item \textbf{5 marks:} Correctly generating a boolean mask based on probability $p$ (or $1-p$).
+    \item \textbf{5 marks:} Correctly applying the inverted dropout scaling factor $\frac{1}{1-p}$.
+    \item \textbf{2 marks:} Correctly applying the mask to the input tensor \texttt{x}.
+\end{itemize}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+
+def dropout(x, p, is_train):
+    if not is_train:
+        # 3 marks: Return unmodified tensor during evaluation
+        return x
+    
+    # 5 marks: Create random mask. We keep neurons with probability (1-p)
+    keep_prob = 1.0 - p
+    mask = (np.random.rand(*x.shape) < keep_prob)
+    
+    # 7 marks: Apply mask and scale (Inverted Dropout)
+    out = (x * mask) / keep_prob
+    
+    return out
+\end{lstlisting}
+
+\textbf{Question 2 (20 marks)}
+\begin{itemize}
+    \item \textbf{6 marks:} Correctly computing the local gradient of the sigmoid $\sigma(z)(1-\sigma(z))$. Since we have \texttt{A}, this is \texttt{A * (1 - A)}.
+    \item \textbf{4 marks:} Applying the chain rule to get \texttt{dZ = d\_out * local\_sigmoid\_grad}.
+    \item \textbf{4 marks:} Computing \texttt{dW} via matrix multiplication (\texttt{X.T @ dZ}).
+    \item \textbf{3 marks:} Computing \texttt{db} by summing \texttt{dZ} over the batch dimension.
+    \item \textbf{3 marks:} Computing \texttt{dX} via matrix multiplication (\texttt{dZ @ W.T}).
+\end{itemize}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+
+def backward_pass(X, W, A, d_out):
+    # Local gradient of sigmoid: A * (1 - A)
+    # Upstream gradient through sigmoid (chain rule)
+    dZ = d_out * A * (1.0 - A)
+    
+    # Gradients for weights, bias, and input
+    dW = np.dot(X.T, dZ)
+    db = np.sum(dZ, axis=0)
+    dX = np.dot(dZ, W.T)
+    
+    return dX, dW, db
+\end{lstlisting}
+
+\subsection*{Part III: Analytic Questions (40 marks)}
+
+\textbf{Question 1: Computational Graph Tracing (20 marks)}
+
+\textbf{Part a) Forward Pass (5 marks)}
+\begin{itemize}
+    \item $p = x \cdot y = 2 \cdot (-1) = -2$
+    \item $q = \max(0, -2) = 0$
+    \item $r = x - y = 2 - (-1) = 3$
+    \item $s = r^2 = 3^2 = 9$
+    \item $f = q + s = 0 + 9 = 9$
+\end{itemize}
+*(1 mark for each correct node value)*
+
+\textbf{Part b) Backward Pass (15 marks)}
+\begin{itemize}
+    \item $\frac{\partial f}{\partial f} = 1$
+    \item $\frac{\partial f}{\partial q} = 1$ and $\frac{\partial f}{\partial s} = 1$ (Addition node routes 1.0 upstream) \textit{(2 marks)}
+    \item Branch 1 (through $s$):
+        \begin{itemize}
+            \item $s = r^2 \implies \frac{\partial s}{\partial r} = 2r = 6$
+            \item $\frac{\partial f}{\partial r} = \frac{\partial f}{\partial s} \cdot \frac{\partial s}{\partial r} = 1 \cdot 6 = 6$ \textit{(3 marks)}
+            \item $r = x - y \implies \frac{\partial r}{\partial x} = 1$ and $\frac{\partial r}{\partial y} = -1$
+            \item $\left(\frac{\partial f}{\partial x}\right)_r = 6 \cdot 1 = 6$ and $\left(\frac{\partial f}{\partial y}\right)_r = 6 \cdot (-1) = -6$ \textit{(3 marks)}
+        \end{itemize}
+    \item Branch 2 (through $q$):
+        \begin{itemize}
+            \item $q = \max(0, p)$. Since $p = -2 < 0$, the local gradient $\frac{\partial q}{\partial p} = 0$.
+            \item $\frac{\partial f}{\partial p} = \frac{\partial f}{\partial q} \cdot \frac{\partial q}{\partial p} = 1 \cdot 0 = 0$ \textit{(3 marks)}
+            \item Because the gradient stops at the ReLU node, $\left(\frac{\partial f}{\partial x}\right)_q = 0$ and $\left(\frac{\partial f}{\partial y}\right)_q = 0$. \textit{(2 marks)}
+        \end{itemize}
+    \item Final summation of gradients:
+        \begin{itemize}
+            \item $\frac{\partial f}{\partial x} = 6 + 0 = \mathbf{6}$
+            \item $\frac{\partial f}{\partial y} = -6 + 0 = \mathbf{-6}$ \textit{(2 marks)}
+        \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Question 2: Weight Decay vs. Decoupled Weight Decay (20 marks)}
+
+\textbf{Part a) Standard L2 Regularization (10 marks)}
+\begin{itemize}
+    \item \textbf{4 marks:} Differentiating $L'$. $\frac{\partial L'}{\partial \mathbf{w}} = \frac{\partial L}{\partial \mathbf{w}} + \lambda \mathbf{w}$.
+    \item \textbf{6 marks:} Showing the SGD update. 
+    \begin{align*}
+    \mathbf{w}_{t+1} &= \mathbf{w}_t - \eta \frac{\partial L'}{\partial \mathbf{w}} \\
+    \mathbf{w}_{t+1} &= \mathbf{w}_t - \eta \left( \frac{\partial L}{\partial \mathbf{w}} + \lambda \mathbf{w}_t \right) \\
+    \mathbf{w}_{t+1} &= \mathbf{w}_t(1 - \eta \lambda) - \eta \frac{\partial L}{\partial \mathbf{w}}
+    \end{align*}
+    This shows why it is called "weight decay": the weight is exponentially decayed by a factor of $(1-\eta\lambda)$ at each step.
+\end{itemize}
+
+\textbf{Part b) Decoupled Weight Decay in Adam (10 marks)}
+\begin{itemize}
+    \item \textbf{5 marks:} Explaining Adam's interference. In standard weight decay, the regularization gradient $\lambda \mathbf{w}$ is added to the loss gradient \textit{before} calculating Adam's moving averages. Adam divides updates by the square root of the moving average of squared gradients. If a weight has a large gradient from the data loss, the denominator becomes large, scaling down the \textit{entire} update step, including the $\lambda \mathbf{w}$ penalty. Thus, parameters with large gradients are penalized less than they should be.
+    \item \textbf{5 marks:} Explaining the Decoupled solution. Decoupled weight decay (AdamW) does not add $\lambda \mathbf{w}$ to the loss gradient. Instead, it computes the Adam update step purely based on the data loss $\frac{\partial L}{\partial \mathbf{w}}$, and then explicitly subtracts $\eta \lambda \mathbf{w}_t$ from the weights at the very end. This ensures the weight decay rate is completely independent of the dynamic learning rates computed by Adam.
+\end{itemize}
+
+\end{document}
